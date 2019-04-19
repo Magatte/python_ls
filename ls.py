@@ -15,6 +15,9 @@ def ls():
         dirs += [os.curdir, os.pardir]
     else:
         dirs = [dir for dir in dirs if dir[0] != '.']
+    
+    dirs.sort()
+    
     for elem in dirs:
         print elem
 
