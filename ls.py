@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 import os, sys, argparse
-import shlex, struct, platform, subprocess
+import struct, platform
+from Carbon.Files import newLineBit
 
  
 class bcolors:
@@ -60,13 +61,14 @@ def getTerminalSize():
  
 def pprintList(inputList):
     (termWidth, termHeight) = getTerminalSize()
+    termHeight = termHeight
     if len( str(inputList) ) <= termWidth:
         print('\t'.join(inputList))
         return
 
     reprList = [repr(x) for x in inputList]
     reprList = [i.replace("'", "") for i in reprList]
-    minCharsBetween = 3 # a comma and two spaces
+    minCharsBetween = 3 # two spaces
     usableTermWidth = termWidth - 3 # For '[ ' and ']' at beginning and end
     minElementWidth = min( len(x) for x in reprList ) + minCharsBetween
     maxElementWidth = max( len(x) for x in reprList ) + minCharsBetween
@@ -98,6 +100,7 @@ def parse_args():
     parser.add_argument('directory', type=str, nargs='?', default='.')
     parser.add_argument('--all', '-a', action='store_true', help='Include dotfiles in listing')
     parser.add_argument('--recursive', '-R', action='store_true', help='Recursively list subdirectories encountered')
+    parser.add_argument('--onlyDir', '-d', action='store_true', help='Only show directories and the number of files of each directory')
     parser.add_argument('--long', '-l', action='store_true', help='Show size for each file or directory')
     parser.add_argument('--reverse', '-r', action='store_true', help='Reverse the display order')
     parser.add_argument('--count', '-c', action='store_true', help='Show the number of lines of each file in a directory')
@@ -110,11 +113,11 @@ def ls_long(dir_list, path):
         print "%d %s" % (size, elem)
 
 
-def display(dirList, options):
+def display(dirList, path, options):
     if options['reverse']:
         dirList.reverse()
-    # if options['long']:
-    #     # modify list to put size
+    if options['long']:
+        dirList = [ str(os.stat(os.path.join(path, elem)).st_size) + ' ' + elem for elem in dirList ]
     # if options['count']:
     #     # modify list to put count
     pprintList(dirList)
@@ -126,10 +129,12 @@ def lsRecursive(path, options):
             newList = files + subdirs
             newList += [os.curdir, os.pardir]
         else:
-            newList = [elem for elem in files if elem[0] != '.'] + [elem for elem in subdirs if elem[0] != '.']
-        newList.sort()
+            subdirs[:] = [elem for elem in subdirs if elem[0] != '.']
+            files = [elem for elem in files if elem[0] != '.']
+            newList = files + subdirs
         print(bcolors.OKBLUE + '--\n' + root + bcolors.ENDC)
-        display(newList, options)
+        newList.sort()
+        display(newList, root, options)
 
 
 def ls(path, options):
@@ -137,10 +142,12 @@ def ls(path, options):
 
     if options['all']:
         dirList += [os.curdir, os.pardir]
+    elif options['onlyDir']:
+        dirList = [ elem for elem in dirList if os.path.isdir(os.path.join(path, elem)) ]
     else:
-        dirList = [elem for elem in dirList if elem[0] != '.']
+        dirList = [ elem for elem in dirList if elem[0] != '.' ]
     dirList.sort()
-    display(dirList, options);
+    display(dirList, path, options);
 
 
 def search(path, options):
@@ -156,8 +163,9 @@ if __name__ == '__main__':
         path = os.path.abspath(args.directory)
         options = dict()
 
-        options['recursive'] = args.recursive
         options['all'] = args.all
+        options['recursive'] = args.recursive
+        options['onlyDir'] = args.onlyDir
         options['long'] = args.long
         options['reverse'] = args.reverse
         options['count'] = args.count
