@@ -130,6 +130,7 @@ def lsRecursive(path, options):
             newList = files + subdirs
             newList += [os.curdir, os.pardir]
         elif options['onlyDir']:
+            options['all'] = False;
             newList = subdirs
         else:
             subdirs[:] = [ elem for elem in subdirs if elem[0] != '.' ]
@@ -150,10 +151,12 @@ def lsRecursive(path, options):
 def ls(path, options):
     dirList = os.listdir(path)
 
-    if options['all']:
+    if options['onlyDir']:
+        options['all'] = False;
         dirList += [os.curdir, os.pardir]
-    elif options['onlyDir']:
         dirList = [ elem for elem in dirList if os.path.isdir(os.path.join(path, elem)) ]
+    elif options['all']:
+        dirList += [os.curdir, os.pardir]
     else:
         dirList = [ elem for elem in dirList if elem[0] != '.' ]
     dirList.sort()
