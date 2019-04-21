@@ -2,8 +2,6 @@
 
 import os, sys, argparse
 import struct, platform
-from Carbon.Files import newLineBit
-from matplotlib import path
 
  
 class bcolors:
@@ -16,6 +14,8 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+
+###     DISPLAY FUNCTIONS   ###
 
 def getTerminalSizeLinux():
     def ioctl_GWINSZ(fd):
@@ -96,7 +96,19 @@ def pprintList(inputList):
             sys.stdout.write('\n')
 
 
-def parse_args():
+def display(dirList, path, options):
+    if options['reverse']:
+        dirList.reverse()
+    if options['long']:
+        dirList = [ str(os.stat(os.path.join(path, elem)).st_size) + ' ' + elem for elem in dirList ]
+    # if options['count']:
+    #     # modify list to put count
+    pprintList(dirList)
+
+
+###     PARSER   ###
+
+def parseArgs():
     parser = argparse.ArgumentParser(description='list files in a directory')
     parser.add_argument('directory', type=str, nargs='?', default='.')
     parser.add_argument('--all', '-a', action='store_true', help='Include dotfiles in listing')
@@ -108,30 +120,23 @@ def parse_args():
     return parser.parse_args()
 
 
+###     CORE    ###
+
 def ls_long(dir_list, path):
     for elem in dir_list:
         size = os.stat(os.path.join(path, elem)).st_size
         print "%d %s" % (size, elem)
 
 
-def display(dirList, path, options):
-    if options['reverse']:
-        dirList.reverse()
-    if options['long']:
-        dirList = [ str(os.stat(os.path.join(path, elem)).st_size) + ' ' + elem for elem in dirList ]
-    # if options['count']:
-    #     # modify list to put count
-    pprintList(dirList)
-
-
 def lsRecursive(path, options):
     for root, subdirs, files in os.walk(path):
-        if options['all']:
+        if options['onlyDir']:
+            options['all'] = False;
+            newList = [os.curdir, os.pardir]
+            newList += subdirs
+        elif options['all']:
             newList = files + subdirs
             newList += [os.curdir, os.pardir]
-        elif options['onlyDir']:
-            options['all'] = False;
-            newList = subdirs
         else:
             subdirs[:] = [ elem for elem in subdirs if elem[0] != '.' ]
             files = [ elem for elem in files if elem[0] != '.' ]
@@ -145,7 +150,6 @@ def lsRecursive(path, options):
             if nbOfFiles > 1:
                 word = word.replace('file', 'files')
             print "%d %s" % (nbOfFiles, word)
-
 
 
 def ls(path, options):
@@ -178,7 +182,7 @@ def search(path, options):
 
 if __name__ == '__main__':
     try:
-        args = parse_args();
+        args = parseArgs();
         path = os.path.abspath(args.directory)
         options = dict()
 
