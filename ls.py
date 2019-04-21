@@ -100,7 +100,7 @@ def display(dirList, path, options):
     if options['reverse']:
         dirList.reverse()
     if options['long']:
-        dirList = [ str(os.stat(os.path.join(path, elem)).st_size) + ' ' + elem for elem in dirList ]
+        dirList = [ str(os.stat(os.path.join(path, elem)).st_size) + ' ' + elem for elem in dirList if os.access(os.path.join(path, elem), os.F_OK) ]
     # if options['count']:
     #     # modify list to put count
     pprintList(dirList)
@@ -121,12 +121,6 @@ def parseArgs():
 
 
 ###     CORE    ###
-
-def ls_long(dir_list, path):
-    for elem in dir_list:
-        size = os.stat(os.path.join(path, elem)).st_size
-        print "%d %s" % (size, elem)
-
 
 def lsRecursive(path, options):
     for root, subdirs, files in os.walk(path):
