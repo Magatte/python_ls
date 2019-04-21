@@ -3,43 +3,24 @@
 import os, sys, argparse
 import shlex, struct, platform, subprocess
 
+ 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
-def get_terminal_size():
-    """ getTerminalSize()
-     - get width and height of console
-     - works on linux,os x,cygwin(windows)
-     originally retrieved from:
-     http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
-    """
-    current_os = platform.system()
-    tuple_xy = None
-    
-    if current_os in ['Linux', 'Darwin'] or current_os.startswith('CYGWIN'):
-        tuple_xy = _get_terminal_size_linux()
-    if tuple_xy is None:
-        print "default"
-        tuple_xy = (80, 25)      # default value
-    return tuple_xy
- 
- 
-def _get_terminal_size_tput():
-    # get terminal width
-    # src: http://stackoverflow.com/questions/263890/how-do-i-find-the-width-height-of-a-terminal-window
-    try:
-        cols = int(subprocess.check_call(shlex.split('tput cols')))
-        rows = int(subprocess.check_call(shlex.split('tput lines')))
-        return (cols, rows)
-    except:
-        pass
- 
- 
-def _get_terminal_size_linux():
+
+def getTerminalSizeLinux():
     def ioctl_GWINSZ(fd):
         try:
             import fcntl
             import termios
-            cr = struct.unpack('hh',
-                               fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
+            cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
             return cr
         except:
             pass
@@ -59,36 +40,54 @@ def _get_terminal_size_linux():
     return int(cr[1]), int(cr[0])
 
 
-def pprint_list(input_list):
-    (term_width, term_height) = get_terminal_size()
-    if len( str(input_list) ) <= term_width:
-        print('\t'.join(input_list))
+def getTerminalSize():
+    """ getTerminalSize()
+     - get width and height of console
+     - works on linux,os x,cygwin(windows)
+     originally retrieved from:
+     http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
+    """
+    currentOs = platform.system()
+    tupleXY = None
+    
+    if currentOs in ['Linux', 'Darwin'] or currentOs.startswith('CYGWIN'):
+        tupleXY = getTerminalSizeLinux()
+    if tupleXY is None:
+        print "default"
+        tupleXY = (80, 25)      # default value
+    return tupleXY
+ 
+ 
+def pprintList(inputList):
+    (termWidth, termHeight) = getTerminalSize()
+    if len( str(inputList) ) <= termWidth:
+        print('\t'.join(inputList))
         return
 
-    repr_list = [repr(x) for x in input_list]
-    repr_list = [i.replace("'", "") for i in repr_list]
-    min_chars_between = 3 # a comma and two spaces
-    usable_term_width = term_width - 3 # For '[ ' and ']' at beginning and end
-    min_element_width = min( len(x) for x in repr_list ) + min_chars_between
-    max_element_width = max( len(x) for x in repr_list ) + min_chars_between
-    if max_element_width >= usable_term_width:
+    reprList = [repr(x) for x in inputList]
+    reprList = [i.replace("'", "") for i in reprList]
+    minCharsBetween = 3 # a comma and two spaces
+    usableTermWidth = termWidth - 3 # For '[ ' and ']' at beginning and end
+    minElementWidth = min( len(x) for x in reprList ) + minCharsBetween
+    maxElementWidth = max( len(x) for x in reprList ) + minCharsBetween
+    if maxElementWidth >= usableTermWidth:
         ncol = 1
         col_widths = [1]
     else:
         # Start with max possible number of columns and reduce until it fits
-        ncol = min( len(repr_list), usable_term_width / min_element_width  )
+        ncol = min( len(reprList), usableTermWidth / minElementWidth  )
         while True:
-            col_widths = [ max( len(x) + min_chars_between \
-                                for j, x in enumerate( repr_list ) if j % ncol == i ) \
+            col_widths = [ max( len(x) + minCharsBetween \
+                                for j, x in enumerate( reprList ) if j % ncol == i ) \
                                 for i in range(ncol) ]
-            if sum( col_widths ) <= usable_term_width: break
+            if sum( col_widths ) <= usableTermWidth: break
             else: ncol -= 1
 
-    for i, x in enumerate(repr_list):
-        if i != len(repr_list)-1:
+    for i, x in enumerate(reprList):
+        if i != len(reprList)-1:
             x += ' '
         sys.stdout.write( x.ljust( col_widths[ i % ncol ] ) )
-        if i == len(repr_list) - 1:
+        if i == len(reprList) - 1:
             sys.stdout.write('\n')
         elif (i + 1) % ncol == 0:
             sys.stdout.write('\n')
@@ -97,22 +96,12 @@ def pprint_list(input_list):
 def parse_args():
     parser = argparse.ArgumentParser(description='list files in a directory')
     parser.add_argument('directory', type=str, nargs='?', default='.')
-    parser.add_argument('files', nargs='*')
     parser.add_argument('--all', '-a', action='store_true', help='Include dotfiles in listing')
-    parser.add_argument('--long', '-l', action='store_true', help='Show size for each file or directory')
     parser.add_argument('--recursive', '-R', action='store_true', help='Recursively list subdirectories encountered')
+    parser.add_argument('--long', '-l', action='store_true', help='Show size for each file or directory')
+    parser.add_argument('--reverse', '-r', action='store_true', help='Reverse the display order')
+    parser.add_argument('--count', '-c', action='store_true', help='Show the number of lines of each file in a directory')
     return parser.parse_args()
-
-
-def get_dir_list(args):
-    dir_list = os.listdir(args.directory)
-
-    if args.all:
-        dir_list += [os.curdir, os.pardir]
-    else:
-        dir_list = [elem for elem in dir_list if elem[0] != '.']
-    dir_list.sort()
-    return dir_list
 
 
 def ls_long(dir_list, path):
@@ -121,31 +110,58 @@ def ls_long(dir_list, path):
         print "%d %s" % (size, elem)
 
 
-def ls_recursive(path):
+def display(dirList, options):
+    if options['reverse']:
+        dirList.reverse()
+    # if options['long']:
+    #     # modify list to put size
+    # if options['count']:
+    #     # modify list to put count
+    pprintList(dirList)
+
+
+def lsRecursive(path, options):
     for root, subdirs, files in os.walk(path):
-        print('--\nroot = ' + root)
-        
-        merge_list = files + subdirs;
-        merge_list.sort()
-        pprint_list(merge_list)
-        
+        if options['all']:
+            newList = files + subdirs
+            newList += [os.curdir, os.pardir]
+        else:
+            newList = [elem for elem in files if elem[0] != '.'] + [elem for elem in subdirs if elem[0] != '.']
+        newList.sort()
+        print(bcolors.OKBLUE + '--\n' + root + bcolors.ENDC)
+        display(newList, options)
 
-def ls(args):
-    dir_list = get_dir_list(args)
-    path = os.path.abspath(args.directory)
 
-    if args.recursive:
-        ls_recursive(path)
+def ls(path, options):
+    dirList = os.listdir(path)
 
-    if args.long:
-        ls_long(dir_list, path)
+    if options['all']:
+        dirList += [os.curdir, os.pardir]
     else:
-        for elem in dir_list:
-            print elem
+        dirList = [elem for elem in dirList if elem[0] != '.']
+    dirList.sort()
+    display(dirList, options);
+
+
+def search(path, options):
+    if options['recursive']:
+        return lsRecursive(path, options)
+    else:
+        return ls(path, options)
+
 
 if __name__ == '__main__':
     try:
         args = parse_args();
-        ls(args)
+        path = os.path.abspath(args.directory)
+        options = dict()
+
+        options['recursive'] = args.recursive
+        options['all'] = args.all
+        options['long'] = args.long
+        options['reverse'] = args.reverse
+        options['count'] = args.count
+
+        search(path, options)
     except OSError as err:
         print err
