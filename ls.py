@@ -3,6 +3,7 @@
 import os, sys, argparse
 import struct, platform
 from Carbon.Files import newLineBit
+from matplotlib import path
 
  
 class bcolors:
@@ -69,26 +70,26 @@ def pprintList(inputList):
     reprList = [repr(x) for x in inputList]
     reprList = [i.replace("'", "") for i in reprList]
     minCharsBetween = 3 # two spaces
-    usableTermWidth = termWidth - 3 # For '[ ' and ']' at beginning and end
+    usableTermWidth = termWidth - 3
     minElementWidth = min( len(x) for x in reprList ) + minCharsBetween
     maxElementWidth = max( len(x) for x in reprList ) + minCharsBetween
     if maxElementWidth >= usableTermWidth:
         ncol = 1
-        col_widths = [1]
+        colWidths = [1]
     else:
         # Start with max possible number of columns and reduce until it fits
         ncol = min( len(reprList), usableTermWidth / minElementWidth  )
         while True:
-            col_widths = [ max( len(x) + minCharsBetween \
+            colWidths = [ max( len(x) + minCharsBetween \
                                 for j, x in enumerate( reprList ) if j % ncol == i ) \
                                 for i in range(ncol) ]
-            if sum( col_widths ) <= usableTermWidth: break
+            if sum( colWidths ) <= usableTermWidth: break
             else: ncol -= 1
 
     for i, x in enumerate(reprList):
-        if i != len(reprList)-1:
+        if i != len(reprList) - 1:
             x += ' '
-        sys.stdout.write( x.ljust( col_widths[ i % ncol ] ) )
+        sys.stdout.write( x.ljust( colWidths[ i % ncol ] ) )
         if i == len(reprList) - 1:
             sys.stdout.write('\n')
         elif (i + 1) % ncol == 0:
@@ -128,13 +129,22 @@ def lsRecursive(path, options):
         if options['all']:
             newList = files + subdirs
             newList += [os.curdir, os.pardir]
+        elif options['onlyDir']:
+            newList = subdirs
         else:
-            subdirs[:] = [elem for elem in subdirs if elem[0] != '.']
-            files = [elem for elem in files if elem[0] != '.']
+            subdirs[:] = [ elem for elem in subdirs if elem[0] != '.' ]
+            files = [ elem for elem in files if elem[0] != '.' ]
             newList = files + subdirs
         print(bcolors.OKBLUE + '--\n' + root + bcolors.ENDC)
         newList.sort()
         display(newList, root, options)
+        if (options['onlyDir']):
+            nbOfFiles = len(files)
+            word = 'file'
+            if nbOfFiles > 1:
+                word = word.replace('file', 'files')
+            print "%d %s" % (nbOfFiles, word)
+
 
 
 def ls(path, options):
@@ -148,6 +158,12 @@ def ls(path, options):
         dirList = [ elem for elem in dirList if elem[0] != '.' ]
     dirList.sort()
     display(dirList, path, options);
+    if (options['onlyDir']):
+            nbOfFiles = len([ elem for elem in os.listdir(path) if os.path.isfile(os.path.join(path, elem))])
+            word = 'file'
+            if nbOfFiles > 1:
+                word = word.replace('file', 'files')
+            print "%d %s" % (nbOfFiles, word)
 
 
 def search(path, options):

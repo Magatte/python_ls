@@ -1,5 +1,5 @@
 # python_ls
-Writing the ls shell command in python
+Writing the ls shell command with python
 
 Handled options:
     * ls -a : shows hidden files
