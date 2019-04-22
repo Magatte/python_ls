@@ -110,7 +110,7 @@ def display(dirList, path, options):
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='list files in a directory')
-    parser.add_argument('directory', type=str, nargs='?', default='.')
+    parser.add_argument('directory', type=str, nargs='*', default='.')
     parser.add_argument('--all', '-a', action='store_true', help='Include dotfiles in listing')
     parser.add_argument('--recursive', '-R', action='store_true', help='Recursively list subdirectories encountered')
     parser.add_argument('--onlyDir', '-d', action='store_true', help='Only show directories and the number of files of each directory')
@@ -124,6 +124,8 @@ def parseArgs():
 
 def lsRecursive(path, options):
     for root, subdirs, files in os.walk(path):
+        subdirs.sort(reverse = options['reverse'])
+        files.sort(reverse = options['reverse'])
         if options['onlyDir']:
             options['all'] = False;
             newList = [os.curdir, os.pardir]
@@ -177,16 +179,21 @@ def search(path, options):
 if __name__ == '__main__':
     try:
         args = parseArgs();
-        path = os.path.abspath(args.directory)
-        options = dict()
+        for elem in args.directory:
+            path = os.path.abspath(elem)
+            try:
+                os.access(path, os.F_OK)
+            except OSError as err:
+                print err
+            options = dict()
 
-        options['all'] = args.all
-        options['recursive'] = args.recursive
-        options['onlyDir'] = args.onlyDir
-        options['long'] = args.long
-        options['reverse'] = args.reverse
-        options['count'] = args.count
+            options['all'] = args.all
+            options['recursive'] = args.recursive
+            options['onlyDir'] = args.onlyDir
+            options['long'] = args.long
+            options['reverse'] = args.reverse
+            options['count'] = args.count
 
-        search(path, options)
+            search(path, options)
     except OSError as err:
         print err
