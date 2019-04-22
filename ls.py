@@ -55,7 +55,7 @@ def getTerminalSize():
     if currentOs in ['Linux', 'Darwin'] or currentOs.startswith('CYGWIN'):
         tupleXY = getTerminalSizeLinux()
     if tupleXY is None:
-        print "default"
+        print("default")
         tupleXY = (80, 25)      # default value
     return tupleXY
  
@@ -78,7 +78,7 @@ def pprintList(inputList):
         colWidths = [1]
     else:
         # Start with max possible number of columns and reduce until it fits
-        ncol = min( len(reprList), usableTermWidth / minElementWidth  )
+        ncol = min( len(reprList), usableTermWidth // minElementWidth  )
         while True:
             colWidths = [ max( len(x) + minCharsBetween \
                                 for j, x in enumerate( reprList ) if j % ncol == i ) \
@@ -145,7 +145,7 @@ def lsRecursive(path, options):
             word = 'file'
             if nbOfFiles > 1:
                 word = word.replace('file', 'files')
-            print "%d %s" % (nbOfFiles, word)
+            print("%d %s" % (nbOfFiles, word))
 
 
 def ls(path, options):
@@ -166,7 +166,7 @@ def ls(path, options):
             word = 'file'
             if nbOfFiles > 1:
                 word = word.replace('file', 'files')
-            print "%d %s" % (nbOfFiles, word)
+            print("%d %s" % (nbOfFiles, word))
 
 
 def search(path, options):
@@ -184,7 +184,7 @@ if __name__ == '__main__':
             try:
                 os.access(path, os.F_OK)
             except OSError as err:
-                print err
+                print(err)
             options = dict()
 
             options['all'] = args.all
@@ -196,4 +196,4 @@ if __name__ == '__main__':
 
             search(path, options)
     except OSError as err:
-        print err
+        print(err)
