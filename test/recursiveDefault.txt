@@ -1,0 +1,86 @@
+[94m--
+.[0m
+README.md	src	test
+[94m--
+./src[0m
+__pycache__	ls.py
+[94m--
+./src/__pycache__[0m
+ls.cpython-36.pyc
+[94m--
+./test[0m
+Durex	__pycache__	recursiveDefault.txt	testLs.py	testLsRecursive.py
+[94m--
+./test/Durex[0m
+Dockerfile   Durex   Durex.service   Makefile      README.md   clean.sh   clients   daemon   
+includes     obj     reset.sh        show_log.sh   src         
+[94m--
+./test/Durex/clients[0m
+Makefile	includes	libft	src
+[94m--
+./test/Durex/clients/includes[0m
+client.h
+[94m--
+./test/Durex/clients/libft[0m
+Makefile              auteur           count_words.c          display_map.c        epur_str.c      
+free_map.c            ft_atoi.c        ft_atoi_long.c         ft_bzero.c           ft_charchr.c    
+ft_countchar.c        ft_isalnum.c     ft_isalpha.c           ft_isascii.c         ft_ischar.c     
+ft_isdigit.c          ft_isint.c       ft_isprint.c           ft_itoa.c            ft_itoa_hex.c   
+ft_lstadd.c           ft_lstdel.c      ft_lstdelone.c         ft_lstfree.c         ft_lstiter.c    
+ft_lstmap.c           ft_lstnew.c      ft_memalloc.c          ft_memccpy.c         ft_memchr.c     
+ft_memcmp.c           ft_memcpy.c      ft_memdel.c            ft_memmove.c         ft_memset.c     
+ft_putaddr.c          ft_putchar.c     ft_putchar_blue_fd.c   ft_putchar_fd.c      ft_putendl.c    
+ft_putendl_fd.c       ft_putnbr.c      ft_putnbr_blue_fd.c    ft_putnbr_fd.c       ft_putstr.c     
+ft_putstr_blue_fd.c   ft_putstr_fd.c   ft_putstr_green_fd.c   ft_putstr_red_fd.c   ft_realloc.c    
+ft_sqrt.c             ft_sqrtf.c       ft_strcat.c            ft_strchr.c          ft_strclr.c     
+ft_strcmp.c           ft_strcpy.c      ft_strdel.c            ft_strdup.c          ft_strequ.c     
+ft_striter.c          ft_striteri.c    ft_strjoin.c           ft_strlcat.c         ft_strlcpy.c    
+ft_strlen.c           ft_strmap.c      ft_strmapi.c           ft_strncat.c         ft_strncmp.c    
+ft_strncpy.c          ft_strnequ.c     ft_strnew.c            ft_strnstr.c         ft_strrchr.c    
+ft_strsplit.c         ft_strstr.c      ft_strsub.c            ft_strtrim.c         ft_swap.c       
+ft_tolower.c          ft_toupper.c     get_char.c             get_next_line.c      includes        
+inter.c               libft.a          make_map.c             make_ptab.c          pow_16.c        
+power.c               print_num.c      push_lines.c           tab_new.c            
+[94m--
+./test/Durex/clients/libft/includes[0m
+get_next_line.h	libft.h
+[94m--
+./test/Durex/clients/src[0m
+client.c	clientSignal.c	initClient.c	term.c
+[94m--
+./test/Durex/daemon[0m
+Makefile	includes	libdaemon.a	obj	src
+[94m--
+./test/Durex/daemon/includes[0m
+matt_daemon.h
+[94m--
+./test/Durex/daemon/obj[0m
+rel
+[94m--
+./test/Durex/daemon/obj/rel[0m
+src
+[94m--
+./test/Durex/daemon/obj/rel/src[0m
+daemon.d          daemon.o   ft_itoa.d   ft_itoa.o   initServer.d   initServer.o   launch_daemon.d   
+launch_daemon.o   logger.d   logger.o    signal.d    signal.o       
+[94m--
+./test/Durex/daemon/src[0m
+daemon.c	ft_itoa.c	initServer.c	launch_daemon.c	logger.c	signal.c
+[94m--
+./test/Durex/includes[0m
+Durex.h
+[94m--
+./test/Durex/obj[0m
+rel
+[94m--
+./test/Durex/obj/rel[0m
+src
+[94m--
+./test/Durex/obj/rel/src[0m
+install.d	install.o	main.d	main.o
+[94m--
+./test/Durex/src[0m
+install.c	main.c
+[94m--
+./test/__pycache__[0m
+testLs.cpython-36.pyc	testLsRecursive.cpython-36.pyc

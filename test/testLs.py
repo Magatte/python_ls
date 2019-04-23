@@ -27,6 +27,23 @@ class testFunctionLs(unittest.TestCase):
         self.assertEqual(len(expectedOutput), len(capturedOutput.getvalue().split()))
         self.assertEqual(expectedOutput, capturedOutput.getvalue().split())
 
+    def testLsDirectoryDefault(self):
+        self.path = '.'
+        capturedOutput = io.StringIO()                      # Create StringIO object
+        sys.stdout = capturedOutput                         # and redirect stdout.
+        self.options['all'] = False
+        self.options['recursive'] = False
+        self.options['onlyDir'] = False
+        self.options['long'] = False
+        self.options['reverse'] = False
+        self.options['count'] = False
+        expectedOutput = ['README.md', 'src', 'test']
+        with contextlib.redirect_stdout(capturedOutput):
+            ls.ls(self.path, self.options)
+        sys.stdout = sys.__stdout__                         # Reset redirect
+        self.assertEqual(len(expectedOutput), len(capturedOutput.getvalue().split()))
+        self.assertEqual(expectedOutput, capturedOutput.getvalue().split())
+
     def testLsDirectoryNotExist(self):
         self.path = 'test/toto'
         self.options['all'] = False

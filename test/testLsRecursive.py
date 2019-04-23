@@ -1,7 +1,8 @@
 import unittest
 import contextlib
 import io
-import sys
+import sys, os
+import difflib
 # sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../src")
 from src import ls
 
@@ -36,6 +37,24 @@ class testFunctionLs(unittest.TestCase):
         sys.stdout = sys.__stdout__                         # Reset redirect
         self.assertEqual(len(expectedOutput), len(capturedOutput.getvalue().split()))
         self.assertEqual(expectedOutput, capturedOutput.getvalue().split())
+
+    def testLsRecursiveDirectoryDefault(self):
+        self.path = '.'
+        capturedOutput = io.StringIO()                      # Create StringIO object
+        self.options['all'] = False
+        self.options['recursive'] = True
+        self.options['onlyDir'] = False
+        self.options['long'] = False
+        self.options['reverse'] = False
+        self.options['count'] = False
+        file = open('test/recursiveDefault.txt', 'r')
+        expectedOutput = file.read()
+        file.close()
+        with contextlib.redirect_stdout(capturedOutput):
+            ls.lsRecursive(self.path, self.options)
+        sys.stdout = sys.__stdout__                         # Reset redirect
+        for line in difflib.unified_diff(expectedOutput, capturedOutput.getvalue()):
+            self.assertEqual(line, "")
 
     def testLsRecursiveDirectoryNotExist(self):
         self.path = 'test/toto'
