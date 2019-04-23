@@ -123,6 +123,7 @@ def parseArgs():
 ###     CORE    ###
 
 def lsRecursive(path, options):
+    dirList = os.listdir(path)
     for root, subdirs, files in os.walk(path):
         subdirs.sort(reverse = options['reverse'])
         files.sort(reverse = options['reverse'])
@@ -171,9 +172,9 @@ def ls(path, options):
 
 def search(path, options):
     if options['recursive']:
-        return lsRecursive(path, options)
+        lsRecursive(path, options)
     else:
-        return ls(path, options)
+        ls(path, options)
 
 
 if __name__ == '__main__':
